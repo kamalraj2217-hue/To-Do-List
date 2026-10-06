@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TaskFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#14212b;--mute:#66737f;--line:#e3e7ec;--acc:#0f766e;--acc-ink:#fff;--accsoft:#e2f3f1;--hi:#dc2626;--med:#d97706;--lo:#16a34a;--shadow:0 1px 2px rgba(20,33,43,.06)}
+:root[data-theme=dark]{--bg:#0f161c;--card:#18222b;--ink:#e8eef3;--mute:#93a1ad;--line:#27333e;--acc:#2dd4bf;--acc-ink:#06201d;--accsoft:#12332f;--hi:#f87171;--med:#fbbf24;--lo:#4ade80;--shadow:none}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.app{display:flex;min-height:100%}
+nav.side{width:232px;padding:24px 16px;border-right:1px solid var(--line);background:var(--card);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+.logo{font-weight:700;font-size:20px;padding:0 12px 18px;display:flex;gap:8px;align-items:center}
+.logo i{width:26px;height:26px;border-radius:8px;background:var(--acc);display:grid;place-items:center;color:var(--acc-ink);font-style:normal;font-size:14px}
+.nav{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;border:0;background:none;color:var(--mute);font-weight:600;text-align:left;width:100%}
+.nav:hover{background:var(--bg)}
+.nav.on{background:var(--accsoft);color:var(--acc)}
+.nav .ct{margin-left:auto;font-size:12px}
+main{flex:1;min-width:0;padding:24px;max-width:960px;margin:0 auto;width:100%}
+h1{font-size:26px;margin:0 0 4px}
+.sub{color:var(--mute);margin:0}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;font-weight:600;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.btn.d{color:var(--hi)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px}
+.stat b{display:block;font-size:26px}
+.stat span{color:var(--mute);font-size:13px}
+.prog{display:flex;gap:16px;align-items:center;margin-bottom:20px}
+.ring{--p:0;width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;flex:none;transition:background .4s}
+.ring div{width:64px;height:64px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:700}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .4s}
+.win{background:var(--accsoft);color:var(--acc);border-radius:12px;padding:12px 14px;font-weight:600;margin-bottom:16px;animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:translateY(-4px)}}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tools input[type=search]{flex:1 1 200px}
+input,select,textarea{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%}
+.tools select{width:auto}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:6px 13px;font-size:13px;font-weight:600;white-space:nowrap;color:var(--mute)}
+.chip.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.list{display:flex;flex-direction:column;gap:8px}
+.task{display:flex;gap:12px;align-items:flex-start;padding:14px;border-left:4px solid var(--c);animation:pop .25s ease}
+.task input[type=checkbox]{width:20px;height:20px;margin-top:2px;accent-color:var(--acc);flex:none}
+.task .t{flex:1;min-width:0}
+.task h3{margin:0;font-size:15px;overflow-wrap:anywhere}
+.task.done h3{text-decoration:line-through;color:var(--mute)}
+.task.done{opacity:.7}
+.task p{margin:4px 0 0;color:var(--mute);font-size:13px;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12px;color:var(--mute)}
+.tag{border:1px solid var(--line);border-radius:99px;padding:2px 9px}
+.tag.over{color:var(--hi);border-color:var(--hi)}
+.acts{display:flex;gap:2px}
+.ib{border:0;background:none;padding:6px 8px;border-radius:8px;color:var(--mute);font-size:13px;font-weight:600}
+.ib:hover{background:var(--bg);color:var(--ink)}
+.empty{text-align:center;padding:48px 16px}
+.empty p{margin:0 0 16px;font-size:17px}
+.modal{position:fixed;inset:0;background:rgba(10,18,24,.55);display:grid;place-items:end center;z-index:20;padding:0}
+.sheet{background:var(--card);width:100%;max-width:520px;border-radius:20px 20px 0 0;padding:20px;max-height:92vh;overflow:auto;animation:pop .25s ease}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.err{color:var(--hi);font-size:13px;margin-top:4px}
+.chk{display:flex;gap:8px;align-items:center;font-weight:500;margin-top:14px}
+.chk input{width:auto}
+.foot{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.set{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.set:last-child{border:0}
+.set select{width:auto}
+.fab{position:fixed;right:20px;bottom:24px;z-index:9;border-radius:99px;padding:13px 20px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.fab[hidden]{display:none}
+.quick{display:flex;gap:8px;margin-bottom:16px}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;z-index:30;animation:pop .25s ease}
+@media(max-width:760px){
+ nav.side{position:fixed;bottom:0;left:0;right:0;top:auto;width:auto;height:auto;flex-direction:row;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));border:0;border-top:1px solid var(--line);z-index:10;justify-content:space-around}
+ .logo{display:none}
+ .nav{flex-direction:column;gap:2px;font-size:11px;padding:6px 4px;text-align:center;align-items:center}
+ .nav .ct{display:none}
+ main{padding:16px 16px 140px}
+ .fab{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+ body{padding-bottom:0}
+}
+@media(min-width:761px){.stats{grid-template-columns:repeat(3,1fr)}.modal{place-items:center;padding:20px}.sheet{border-radius:20px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="side" id="nav" aria-label="Main"></nav>
+  <main id="main" aria-live="polite"></main>
+</div>
+<button class="btn p fab" id="fab" data-act="add" aria-label="Add task">+ Add Task</button>
+<div id="layer"></div>
+<script>
+/* ---------- Storage layer (swap this object for Supabase later) ---------- */
+const Store = {
+  _g(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  _s(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+  async getTasks(){ return this._g('tf.tasks', []); },
+  async saveTasks(t){ return this._s('tf.tasks', t); },
+  async getSettings(){ return this._g('tf.settings', { theme:'light', priority:'Medium', category:'Personal' }); },
+  async saveSettings(s){ return this._s('tf.settings', s); }
+};
+
+/* ---------- State ---------- */
+let tasks = [], settings = {}, view = 'dashboard', filter = 'All', sort = 'due', q = '', loading = true, error = '';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const PR = { High:3, Medium:2, Low:1 }, PC = { High:'var(--hi)', Medium:'var(--med)', Low:'var(--lo)' };
+const iso = d => new Date(d.getTime() - d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const today = () => iso(new Date());
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now() + Math.random().toString(16).slice(2));
+const dueStamp = t => t.due ? new Date(t.due + 'T' + (t.time || '23:59')).getTime() : Infinity;
+const isOver = t => !t.done && t.due && dueStamp(t) < Date.now();
+
+async function persist(){
+  const ok = await Store.saveTasks(tasks);
+  if (!ok) toast('Could not save. Storage may be full or blocked.');
+}
+function toast(m){ const e = document.createElement('div'); e.className = 'toast'; e.textContent = m; document.body.append(e); setTimeout(() => e.remove(), 2400); }
+
+/* ---------- Derived ---------- */
+function stats(){
+  const total = tasks.length, done = tasks.filter(t => t.done).length;
+  return { total, done, pending: total - done, pct: total ? Math.round(done / total * 100) : 0 };
+}
+const fmtTime = ts => new Date(ts).toLocaleTimeString(undefined, { hour:'numeric', minute:'2-digit' });
+const dayOf = ts => iso(new Date(ts));
+function practice(){
+  const days = new Set(tasks.filter(t => t.done && t.completedAt).map(t => dayOf(t.completedAt)));
+  let streak = 0, d = new Date();
+  if (!days.has(iso(d))) d.setDate(d.getDate() - 1);
+  while (days.has(iso(d))) { streak++; d.setDate(d.getDate() - 1); }
+  return { days: days.size, streak };
+}
+function History(list){
+  const g = {};
+  list.filter(t => t.completedAt).sort((a,b) => b.completedAt - a.completedAt).forEach(t => (g[dayOf(t.completedAt)] ||= []).push(t));
+  const undated = list.filter(t => !t.completedAt);
+  const sect = Object.keys(g).sort().reverse().map(k => `<h2 style="font-size:15px;margin:18px 0 8px">${new Date(k + 'T00:00').toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' })} <span class="sub" style="font-weight:500">· ${g[k].length} finished, last at ${fmtTime(g[k][0].completedAt)}</span></h2><div class="list">${g[k].map(TaskCard).join('')}</div>`).join('');
+  return sect + (undated.length ? `<h2 style="font-size:15px;margin:18px 0 8px">Earlier <span class="sub" style="font-weight:500">· finish time not recorded</span></h2><div class="list">${undated.map(TaskCard).join('')}</div>` : '');
+}
+function todayStats(){
+  const t = tasks.filter(x => x.due === today());
+  return { n: t.length, done: t.filter(x => x.done).length };
+}
+function visible(base){
+  let l = base.slice();
+  const td = today();
+  if (q.trim()) l = l.filter(t => t.title.toLowerCase().includes(q.trim().toLowerCase()));
+  if (view === 'tasks') {
+    if (filter === 'Today') l = l.filter(t => t.due === td);
+    if (filter === 'Upcoming') l = l.filter(t => t.due > td && !t.done);
+    if (filter === 'Completed') l = l.filter(t => t.done);
+    if (filter === 'Pending') l = l.filter(t => !t.done);
+    if (filter === 'High Priority') l = l.filter(t => t.priority === 'High');
+  }
+  if (sort === 'due') l.sort((a,b) => dueStamp(a) - dueStamp(b));
+  if (sort === 'priority') l.sort((a,b) => PR[b.priority] - PR[a.priority] || dueStamp(a) - dueStamp(b));
+  if (sort === 'recent') l.sort((a,b) => b.created - a.created);
+  return l;
+}
+
+/* ---------- Components ---------- */
+function Sidebar(){
+  const items = [['dashboard','Dashboard','▦'],['tasks','My Tasks','☰'],['completed','Completed','✓'],['settings','Settings','⚙']];
+  $('#nav').innerHTML = `<div class="logo"><i>✓</i>TaskFlow</div>` + items.map(([k,l,i]) =>
+    `<button class="nav ${view===k?'on':''}" data-nav="${k}" ${view===k?'aria-current="page"':''}><span aria-hidden="true">${i}</span>${l}${k==='tasks'?`<span class="ct">${stats().pending}</span>`:''}</button>`).join('');
+}
+function Header(){
+  const h = new Date().getHours(), g = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const date = new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  const titles = { tasks:['My Tasks','Everything on your list.'], completed:['Completed','Nice work. Here is what you finished.'], settings:['Settings','Make TaskFlow yours.'] };
+  const [t, s] = view === 'dashboard' ? [`${g}!`, 'What do you want to accomplish today?'] : titles[view];
+  return `<div class="top"><div><p class="sub">${view==='dashboard'?date:'TaskFlow'}</p><h1>${t}</h1><p class="sub">${s}</p></div>
+  ${view!=='settings'?`<button class="btn p" data-act="add">+ Add Task</button>`:''}</div>`;
+}
+function ProgressCard(){
+  const s = stats(), t = todayStats();
+  return `<div class="stats">
+    <div class="card stat"><b>${s.total}</b><span>Total tasks</span></div>
+    <div class="card stat"><b>${s.done}</b><span>Completed</span></div>
+    <div class="card stat"><b>${s.pending}</b><span>Pending</span></div></div>
+  <div class="stats" style="grid-template-columns:repeat(2,1fr)"><div class="card stat"><b>${practice().days}</b><span>Days practiced</span></div><div class="card stat"><b>${practice().streak}</b><span>Day streak</span></div></div>
+  <div class="card prog"><div class="ring" style="--p:${s.pct}"><div>${s.pct}%</div></div>
+    <div style="flex:1"><strong>Today's Progress</strong><p class="sub">${t.n ? `${t.done} / ${t.n} tasks due today completed` : 'No tasks due today'}</p>
+    <div class="bar" role="progressbar" aria-valuenow="${s.pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${s.pct}%"></i></div></div></div>
+  ${t.n && t.done === t.n ? `<div class="win" role="status">Great job! You completed everything for today! 🎉</div>` : ''}`;
+}
+function SearchBar(){
+  return `<div class="tools"><input type="search" id="q" placeholder="Search tasks by title" aria-label="Search tasks" value="${esc(q)}">
+  <select id="sort" aria-label="Sort tasks"><option value="due">Sort: Due date</option><option value="priority">Sort: Priority</option><option value="recent">Sort: Recently added</option></select></div>`;
+}
+function TaskFilter(){
+  return `<div class="chips" role="group" aria-label="Filter tasks">${['All','Today','Upcoming','Completed','Pending','High Priority'].map(f =>
+    `<button class="chip ${filter===f?'on':''}" data-filter="${f}" aria-pressed="${filter===f}">${f}</button>`).join('')}</div>`;
+}
+function TaskCard(t){
+  const fmt = t.due ? new Date(t.due + 'T00:00').toLocaleDateString(undefined, { month:'short', day:'numeric' }) + (t.time ? ' · ' + t.time : '') : '';
+  return `<article class="card task ${t.done?'done':''}" style="--c:${PC[t.priority]}" data-id="${t.id}">
+    <input type="checkbox" ${t.done?'checked':''} data-act="toggle" aria-label="Mark ${esc(t.title)} as ${t.done?'pending':'completed'}">
+    <div class="t"><h3>${esc(t.title)}</h3>${t.notes?`<p>${esc(t.notes)}</p>`:''}
+      <div class="meta"><span class="tag">${t.priority}</span><span class="tag">${t.category}</span>
+      ${fmt?`<span class="tag ${isOver(t)?'over':''}">${isOver(t)?'Overdue · ':''}${fmt}</span>`:''}${t.reminder?'<span class="tag">🔔 Reminder</span>':''}${t.done&&t.completedAt?`<span class="tag" style="color:var(--lo);border-color:var(--lo)">✓ Finished ${fmtTime(t.completedAt)}</span>`:''}</div></div>
+    <div class="acts"><button class="ib" data-act="edit" aria-label="Edit ${esc(t.title)}">Edit</button><button class="ib" data-act="del" aria-label="Delete ${esc(t.title)}">Delete</button></div></article>`;
+}
+function EmptyState(searching){
+  return searching ? `<div class="card empty"><p>No tasks match your search or filter.</p><button class="btn" data-act="reset">Clear filters</button></div>`
+    : `<div class="card empty"><p>No tasks yet. Add your first task and get started! 🚀</p><button class="btn p" data-act="add">Add Task</button></div>`;
+}
+function SettingsView(){
+  const opt = (arr, v) => arr.map(x => `<option ${x===v?'selected':''}>${x}</option>`).join('');
+  return `<div class="card">
+    <div class="set"><div><strong>Dark mode</strong><p class="sub">Easier on the eyes at night.</p></div><input type="checkbox" id="theme" ${settings.theme==='dark'?'checked':''} style="width:22px;height:22px;accent-color:var(--acc)" aria-label="Dark mode"></div>
+    <div class="set"><strong>Default priority</strong><select id="dp">${opt(['Low','Medium','High'], settings.priority)}</select></div>
+    <div class="set"><strong>Default category</strong><select id="dc">${opt(['Personal','Study','Work','Other'], settings.category)}</select></div>
+    <div class="set"><div><strong>Clear all tasks</strong><p class="sub">Permanently removes every task.</p></div><button class="btn d" data-act="clear">Clear all</button></div></div>`;
+}
+
+/* ---------- Render ---------- */
+function render(){
+  Sidebar();
+  $('#fab').hidden = view === 'settings';
+  const m = $('#main');
+  if (loading) { m.innerHTML = Header() + '<div class="card empty"><p>Loading your tasks…</p></div>'; return; }
+  if (error) { m.innerHTML = Header() + `<div class="card empty"><p>${esc(error)}</p><button class="btn p" data-act="retry">Try again</button></div>`; return; }
+  const keepFocus = document.activeElement && document.activeElement.id === 'q';
+  let html = Header();
+  if (view === 'settings') html += SettingsView();
+  else {
+    if (view === 'dashboard') html += `<div class="quick"><input id="qa" maxlength="120" placeholder="Quick add: type a task and press Enter" aria-label="Quick add task"><button class="btn p" data-act="quick">Add</button></div>` + ProgressCard();
+    if (!tasks.length) html += EmptyState(false);
+    else {
+      const base = view === 'completed' ? tasks.filter(t => t.done) : tasks;
+      if (view === 'dashboard') {
+        const l = visible(base.filter(t => !t.done)).slice(0, 5);
+        html += `<h2 style="font-size:17px;margin:4px 0 10px">Up next</h2>` + (l.length ? `<div class="list">${l.map(TaskCard).join('')}</div><p><button class="btn" data-nav="tasks" style="margin-top:12px">View all tasks</button></p>` : `<div class="card empty"><p>Nothing pending. Enjoy the calm. 🎉</p></div>`);
+      } else {
+        html += SearchBar() + (view === 'tasks' ? TaskFilter() : '');
+        const l = visible(base);
+        html += !l.length ? EmptyState(true) : view === 'completed' ? (() => { const p = practice(); return `<div class="stats" style="grid-template-columns:repeat(2,1fr)"><div class="card stat"><b>${p.days}</b><span>Days practiced</span></div><div class="card stat"><b>${p.streak}</b><span>Day streak</span></div></div>` + History(l); })() : `<div class="list">${l.map(TaskCard).join('')}</div>`;
+      }
+    }
+  }
+  m.innerHTML = html;
+  const s = $('#sort'); if (s) s.value = sort;
+  if (keepFocus) { const e = $('#q'); e.focus(); e.setSelectionRange(q.length, q.length); }
+}
+
+/* ---------- Modals ---------- */
+function openModal(html){ $('#layer').innerHTML = `<div class="modal" id="ov"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; const f = $('#layer input,#layer button'); f && f.focus(); }
+function closeModal(){ $('#layer').innerHTML = ''; }
+function confirmBox(msg, label, fn){
+  openModal(`<h2 style="margin:0 0 8px;font-size:18px">Are you sure?</h2><p class="sub">${msg}</p><div class="foot"><button class="btn" data-m="x">Cancel</button><button class="btn p" id="yes" style="background:var(--hi);border-color:var(--hi);color:#fff">${label}</button></div>`);
+  $('#yes').onclick = () => { closeModal(); fn(); };
+}
+function TaskForm(t){
+  const e = t || { title:'', notes:'', due:'', time:'', priority:settings.priority, category:settings.category, reminder:false };
+  const opt = (arr, v) => arr.map(x => `<option ${x===v?'selected':''}>${x}</option>`).join('');
+  openModal(`<h2 style="margin:0;font-size:20px">${t?'Edit task':'Add task'}</h2>
+  <label for="f-title">Task title</label><input id="f-title" maxlength="120" value="${esc(e.title)}" aria-describedby="f-err"><div class="err" id="f-err" role="alert"></div>
+  <label for="f-notes">Notes</label><textarea id="f-notes" rows="3">${esc(e.notes)}</textarea>
+  <div class="row"><div><label for="f-due">Due date</label><input type="date" id="f-due" value="${e.due}"></div><div><label for="f-time">Due time</label><input type="time" id="f-time" value="${e.time}"></div></div>
+  <div class="row"><div><label for="f-pr">Priority</label><select id="f-pr">${opt(['Low','Medium','High'], e.priority)}</select></div><div><label for="f-cat">Category</label><select id="f-cat">${opt(['Personal','Study','Work','Other'], e.category)}</select></div></div>
+  <label class="chk"><input type="checkbox" id="f-rem" ${e.reminder?'checked':''}> Remind me when it's due</label>
+  <div class="foot"><button class="btn" data-m="x">Cancel</button><button class="btn p" id="f-save">${t?'Save changes':'Add task'}</button></div>`);
+  $('#f-save').onclick = async () => {
+    const title = $('#f-title').value.trim(), due = $('#f-due').value, time = $('#f-time').value, err = $('#f-err');
+    if (!title) { err.textContent = 'Enter a task title to continue.'; $('#f-title').focus(); return; }
+    if (due && (isNaN(new Date(due)) || due < '2000-01-01' || due > '2100-12-31')) { err.textContent = 'Enter a valid due date.'; return; }
+    if (!t && due && due < today()) { err.textContent = 'The due date is in the past. Pick today or later.'; return; }
+    if (time && !due) { err.textContent = 'Add a due date to go with the time.'; return; }
+    const data = { title, notes: $('#f-notes').value.trim(), due, time, priority: $('#f-pr').value, category: $('#f-cat').value, reminder: $('#f-rem').checked };
+    if (data.reminder && 'Notification' in window && Notification.permission === 'default') { try { Notification.requestPermission(); } catch {} }
+    if (t) Object.assign(t, data); else tasks.unshift({ id: uid(), done:false, created: Date.now(), ...data });
+    closeModal(); render(); await persist(); toast(t ? 'Task updated' : 'Task added');
+  };
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click', async ev => {
+  const el = ev.target.closest('[data-nav],[data-filter],[data-act],[data-m]');
+  if (ev.target.id === 'ov') return closeModal();
+  if (!el) return;
+  if (el.dataset.m) return closeModal();
+  if (el.dataset.nav) { view = el.dataset.nav; q = ''; render(); window.scrollTo(0,0); return; }
+  if (el.dataset.filter) { filter = el.dataset.filter; render(); return; }
+  const card = el.closest('[data-id]'), t = card && tasks.find(x => x.id === card.dataset.id), a = el.dataset.act;
+  if (a === 'quick') return quickAdd();
+  if (a === 'add') TaskForm();
+  if (a === 'edit' && t) TaskForm(t);
+  if (a === 'del' && t) confirmBox(`"${esc(t.title)}" will be permanently deleted.`, 'Delete task', async () => { tasks = tasks.filter(x => x !== t); render(); await persist(); toast('Task deleted'); });
+  if (a === 'clear') confirmBox('This permanently deletes all your tasks. You cannot undo this.', 'Clear all tasks', async () => { tasks = []; render(); await persist(); toast('All tasks cleared'); });
+  if (a === 'reset') { q = ''; filter = 'All'; render(); }
+  if (a === 'retry') init();
+});
+document.addEventListener('change', async ev => {
+  const el = ev.target;
+  if (el.dataset.act === 'toggle') { const t = tasks.find(x => x.id === el.closest('[data-id]').dataset.id); t.done = el.checked; t.completedAt = el.checked ? Date.now() : null; render(); await persist(); }
+  if (el.id === 'sort') { sort = el.value; render(); }
+  if (el.id === 'theme') { settings.theme = el.checked ? 'dark' : 'light'; applyTheme(); await Store.saveSettings(settings); }
+  if (el.id === 'dp') { settings.priority = el.value; await Store.saveSettings(settings); }
+  if (el.id === 'dc') { settings.category = el.value; await Store.saveSettings(settings); }
+});
+document.addEventListener('input', ev => { if (ev.target.id === 'q') { q = ev.target.value; render(); } });
+async function quickAdd(){
+  const i = $('#qa'), title = i.value.trim();
+  if (!title) { toast('Enter a task title to continue.'); i.focus(); return; }
+  tasks.unshift({ id: uid(), title, notes:'', due: today(), time:'', priority: settings.priority, category: settings.category, reminder:false, done:false, created: Date.now() });
+  render(); $('#qa').focus(); await persist(); toast('Task added');
+}
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') closeModal();
+  if (ev.key === 'Enter' && ev.target.id === 'qa') quickAdd();
+});
+
+function applyTheme(){ document.documentElement.dataset.theme = settings.theme; }
+function checkReminders(){
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const now = Date.now();
+  tasks.forEach(t => { if (t.reminder && !t.done && !t.notified && t.due && dueStamp(t) <= now && dueStamp(t) > now - 864e5) { t.notified = true; new Notification('TaskFlow', { body: t.title + ' is due' }); persist(); } });
+}
+async function init(){
+  loading = true; error = ''; render();
+  try {
+    [tasks, settings] = await Promise.all([Store.getTasks(), Store.getSettings()]);
+    if (!Array.isArray(tasks)) tasks = [];
+    applyTheme();
+  } catch (e) { error = 'We could not load your tasks. Try again.'; }
+  loading = false; render(); checkReminders();
+}
+setInterval(checkReminders, 60000);
+init();
+</script>
+</body>
+</html>
